@@ -14,7 +14,7 @@ def app():
 
     st.title('Sales Dashboard')
     
-    sales_example = "data\\sales_example.png"
+    sales_example = "C:\\Users\\derek\\OneDrive - BYU-Idaho\\Documents\\Data Science Society\\ibc-business-tracker\\data\\sales_example.png"
 
     with st.expander('Help ✋'):
         st.markdown('***How does this work?***')
@@ -63,7 +63,7 @@ def app():
         overview = overview.drop(columns = 'Date')
         overview = overview.groupby('Item Sold')
         overview = overview.describe()
-        st.dataframe(overview)
+        st.table(overview)
         
         # def plot_line_chart(df, title):
         #         plt.figure(figsize=(10, 6))
