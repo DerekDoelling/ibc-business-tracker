@@ -4,13 +4,16 @@ import pandas as pd
 import openpyxl
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
 
 # Page title
 # st.set_page_config(page_title='Sales Dashboard', page_icon='📊')
-st.title('Sales Dashboard')
 
 def app():
 
+    st.title('Sales Dashboard')
+    
     if 'uploaded_file' in st.session_state:
         uploaded_file = st.session_state.uploaded_file
         
@@ -34,9 +37,9 @@ def app():
         date_range = [pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])]
         
         # Filter data
-        # filtered_data = df[(df['Date'] >= date_range[0]) & (df['Date'] <= date_range[1])]
-        # if items:
-        #     filtered_data = filtered_data[filtered_data['Item Sold'].isin(items)]
+        filtered_data = df[(df['Date'] >= date_range[0]) & (df['Date'] <= date_range[1])]
+        if items:
+            filtered_data = filtered_data[filtered_data['Item Sold'].isin(items)]
         
         # Display data
         st.header('Data')
@@ -55,24 +58,39 @@ def app():
         
         # Sales by Date (Line Chart)
         st.header('Sales by Date')
-        sales_by_date = df.groupby('Date')['Total Sales'].sum()
-        fig, ax = plt.subplots()
-        ax.plot(sales_by_date.index, sales_by_date.values, marker='o')
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Total Sales')
-        # ax.set_title('Sales by Date')
-        ax.tick_params(axis='x', rotation=45)  # Make x-axis labels horizontal
-        st.pyplot(fig)
+        sales_by_date = filtered_data.copy()
+        sales_by_date['date'] = sales_by_date['Date'].dt.strftime('%b %d')
+        sales_by_date = sales_by_date.groupby(['Date', 'date'])['Total Sales'].sum()
+        sales_by_date = sales_by_date.reset_index().drop(columns=['Date'])
+        sales_by_date = px.line(sales_by_date, x=sales_by_date['date'], y=sales_by_date['Total Sales'], markers=True)
+        sales_by_date.update_layout(xaxis_title='Date', yaxis_title='Total Sales')
+        sales_by_date.update_traces(hovertemplate='Date: %{x}<br>Total Sales: %{y:.2f}$')
+        sales_by_date.update_yaxes(tickformat="$.0f")
+        sales_by_date.update_layout(xaxis=dict(tickmode='linear',dtick=7))
+ 
+        st.plotly_chart(sales_by_date)
+        # fig, ax = plt.subplots()
+        # ax.plot(sales_by_date.index, sales_by_date.values, marker='o')
+        # ax.set_xlabel('Date')
+        # ax.set_ylabel('Total Sales')
+        # # ax.set_title('Sales by Date')
+        # ax.tick_params(axis='x', rotation=45)  # Make x-axis labels horizontal
+        # st.pyplot(fig)
         
         # Sales by Item Sold (Bar Chart)
         st.header('Sales by Item Sold')
-        sales_by_item = df.groupby('Item Sold')['Total Sales'].sum()
-        fig, ax = plt.subplots()
-        sales_by_item.plot(kind='barh', ax=ax)
-        ax.set_ylabel('')
-        ax.set_xlabel('Total Sales $')
-        # ax.set_title('Sales by Item Sold')
-        st.pyplot(fig)
+        sales_by_item = filtered_data.groupby('Item Sold')['Total Sales'].sum().sort_values(ascending=True).reset_index()
+
+        sales_by_item = go.Figure(go.Bar(x=sales_by_item['Total Sales'], y=sales_by_item['Item Sold'], orientation='h'))
+        sales_by_item.update_traces(hovertemplate='Item: %{y}<br>Total Sales: $%{x:,.2f}<extra></extra>')
+        sales_by_item.update_xaxes(tickformat="$.0f")
+        st.plotly_chart(sales_by_item)
+        # fig, ax = plt.subplots()
+        # sales_by_item.plot(kind='barh', ax=ax)
+        # ax.set_ylabel('')
+        # ax.set_xlabel('Total Sales $')
+        # # ax.set_title('Sales by Item Sold')
+        # st.pyplot(fig)
         
         # Quantity Sold by Item Sold (Horizontal Bar Chart)
         st.header('Quantity Sold by Item Sold')
