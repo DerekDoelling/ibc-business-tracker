@@ -43,7 +43,17 @@ def app():
         
         # Display data
         st.header('Data')
+
         st.dataframe(df)
+
+        # Display overview
+        st.header('Overview')
+
+        overview = df.copy()
+        overview = overview.drop(columns = 'Date')
+        overview = overview.groupby('Item Sold')
+        overview = overview.describe()
+        st.dataframe(overview)
         
         # def plot_line_chart(df, title):
         #         plt.figure(figsize=(10, 6))
@@ -62,7 +72,7 @@ def app():
         sales_by_date['date'] = sales_by_date['Date'].dt.strftime('%b %d')
         sales_by_date = sales_by_date.groupby(['Date', 'date'])['Total Sales'].sum()
         sales_by_date = sales_by_date.reset_index().drop(columns=['Date'])
-        sales_by_date = px.line(sales_by_date, x=sales_by_date['date'], y=sales_by_date['Total Sales'], markers=True)
+        sales_by_date = px.line(sales_by_date, x=sales_by_date['date'], y=sales_by_date['Total Sales'], markers=True, color_discrete_sequence=['#F63366'])
         sales_by_date.update_layout(xaxis_title='Date', yaxis_title='Total Sales')
         sales_by_date.update_traces(hovertemplate='Date: %{x}<br>Total Sales: %{y:.2f}$')
         sales_by_date.update_yaxes(tickformat="$.0f")
@@ -81,7 +91,7 @@ def app():
         st.header('Sales by Item Sold')
         sales_by_item = filtered_data.groupby('Item Sold')['Total Sales'].sum().sort_values(ascending=True).reset_index()
 
-        sales_by_item = go.Figure(go.Bar(x=sales_by_item['Total Sales'], y=sales_by_item['Item Sold'], orientation='h'))
+        sales_by_item = go.Figure(go.Bar(x=sales_by_item['Total Sales'], y=sales_by_item['Item Sold'], orientation='h', marker =dict(color = '#F63366')))
         sales_by_item.update_traces(hovertemplate='Item: %{y}<br>Total Sales: $%{x:,.2f}<extra></extra>')
         sales_by_item.update_xaxes(tickformat="$.0f")
         st.plotly_chart(sales_by_item)
@@ -94,29 +104,44 @@ def app():
         
         # Quantity Sold by Item Sold (Horizontal Bar Chart)
         st.header('Quantity Sold by Item Sold')
-        quantity_by_item = df.groupby('Item Sold')['Quantity Sold '].sum()
-        fig, ax = plt.subplots()
-        quantity_by_item.plot(kind='barh', ax=ax)
-        ax.set_xlabel('Quantity Sold')
-        ax.set_ylabel('')
+        quantity_by_item = filtered_data.groupby('Item Sold')['Quantity Sold '].sum().sort_values(ascending=True).reset_index()
+        quantity_by_item = go.Figure(go.Bar(x=quantity_by_item['Quantity Sold '], y=quantity_by_item['Item Sold'], orientation='h', marker =dict(color = '#F63366')))
+        quantity_by_item.update_traces(hovertemplate='Item: %{y}<br>Quantity Sold: %{x}<extra></extra>')
+        # fig, ax = plt.subplots()
+        # quantity_by_item.plot(kind='barh', ax=ax)
+        # ax.set_xlabel('Quantity Sold')
+        # ax.set_ylabel('')
         # ax.set_title('Quantity Sold by Item Sold')
-        st.pyplot(fig)
+        st.plotly_chart(quantity_by_item)
         
         # Extract day of the week
-        df['DayOfWeek'] = df['Date'].dt.day_name()
-        
+        st.header('Quantity Sold by Day of the Week')
+        weekday = filtered_data.copy()
+        weekday['DayOfWeek'] = weekday['Date'].dt.day_name()
+        weekday_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
         # Filter for weekdays (Monday to Friday)
-        weekday_data = df[df['DayOfWeek'].isin(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])]
+        weekday_data = weekday[weekday['DayOfWeek'].isin(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])]
+        weekday_data['DayOfWeek'] = pd.Categorical(weekday_data['DayOfWeek'], categories=weekday_order, ordered=True)
+        weekday_data = weekday_data.groupby(['DayOfWeek', 'Item Sold'])['Quantity Sold '].mean().reset_index()
+
+        quantity_sold = px.line(weekday_data, x=weekday_data['DayOfWeek'], y=weekday_data['Quantity Sold '], color = weekday_data['Item Sold'], markers=True)
+        quantity_sold.update_layout(xaxis_title='Day of the Week', yaxis_title='Average Quantity Sold')
+        quantity_sold.update_traces(hovertemplate='Item: %{customdata[0]}<br>Day: %{x}<br>Average Quantity Sold: %{y:,.1f}<extra></extra>',customdata=weekday_data['Item Sold'].values.reshape(-1, 1))
+        st.plotly_chart(quantity_sold)
+        # fig, ax = plt.subplots()
+        # weekday = weekday.groupby(['DayOfWeek', 'Item'])['Quantity Sold '].mean().reindex(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])  #.plot(ax=ax, marker='o', label="")
         
-        fig, ax = plt.subplots()
-        weekday_data.groupby('DayOfWeek')['Quantity Sold '].mean().reindex(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']).plot(ax=ax, marker='o', label="")
-        
-        st.header('Average Quantity Sold by Day of the Week')
-        ax.set_ylabel('Average Quantity Sold')
+        # weekday_data = px.line(weekday, x=weekday.index, y=weekday['Quantity Sold '], markers=True)
+        # weekday_data.update_layout(xaxis_title='Day of the Week', yaxis_title='Average Quantity Sold')
+        # weekday_data.update_traces(hovertemplate='Day: %{x}<br>Average Quantity Sold: %{y:.2f}')
+        # st.plotly_chart(weekday_data)
+        # st.header('Average Quantity Sold by Day of the Week')
+        # ax.set_ylabel('Average Quantity Sold')
         # ax.set_title('Average Quantity Sold by Day of the Week')
-        ax.set_xlabel('Day of the Week')
-        ax.legend()
-        st.pyplot(fig)
+        # ax.set_xlabel('Day of the Week')
+        # ax.legend()
+        # st.pyplot(fig)
         
         # Advanced Chart: Pair Plot of Sales Data
         # st.header('Pair Plot of Sales Data')
