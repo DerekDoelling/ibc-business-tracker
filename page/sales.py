@@ -12,13 +12,13 @@ import plotly.graph_objects as go
 
 def app():
 
-    st.title('Sales Dashboard')
+    st.title('Sales Dashboard 💰')
     
     sales_example = "C:\\Users\\derek\\OneDrive - BYU-Idaho\\Documents\\Data Science Society\\ibc-business-tracker\\data\\sales_example.png"
 
     with st.expander('Help ✋'):
         st.markdown('***How does this work?***')
-        st.markdown('This dashboard will automatically load all the data from the Sales sheet in the Excel file you upload. It will then provide a summary table and insightful visualizations of the data. You can also filter the data by the date and the items sold on the left under ***Filters*** to get a deeper understanding.')
+        st.markdown('This dashboard will automatically load all the data from the "Sales" sheet in the Excel file you upload. It will then provide a summary table and insightful visualizations of the data. You can also filter the data by the date and the items sold on the left under ***Filters*** to get a deeper understanding.')
         st.markdown('***Why am I getting an error?***')
         st.markdown('If you are getting an error, please make sure that you are uploading the correct file. The file should be an excel file with a sheet named "Sales".')
         st.markdown('Within the "Sales" sheet, there should be these five columns: Transaction ID, Date, Item Sold, Quantity Sold, and Total Sales. You can add columns to the sheet, but you must have at least the specified columns.')
@@ -52,7 +52,7 @@ def app():
             filtered_data = filtered_data[filtered_data['Item Sold'].isin(items)]
         
         # Display data
-        st.header('Sales Data')
+        st.subheader('Sales')
 
         st.dataframe(df)
 
@@ -77,6 +77,8 @@ def app():
         # plot_line_chart(df,'Sales by Date')
         
         # Sales by Date (Line Chart)
+        # st.header("Sales Analysis")
+
         st.header('Sales by Date')
         sales_by_date = filtered_data.copy()
         sales_by_date['date'] = sales_by_date['Date'].dt.strftime('%b %d')

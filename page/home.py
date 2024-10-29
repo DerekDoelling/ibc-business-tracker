@@ -52,6 +52,7 @@ def app():
                 """, unsafe_allow_html=True)
 
         st.success("File Uploaded Successfully!")
+        st.write("You can click on the different dashboards on the left under ***Navigation*** to see the different dashboards.")
         
         # df = pd.read_excel(uploaded_file, skiprows=1, usecols=list(range(1, 17))) #"Year", "Smstr", "#", "Company Name", "Primary Location", "Rent/Domain Amount  for Primary Location", "Description", "Revenue", "COGS", "Gross Profit", "Gross Margin", "Operating Expenses", "Operating Income", "Net Income", "Ending Cash Balance", "Net Income Margin"])
 

@@ -8,7 +8,7 @@ st.set_page_config(page_title='IBC Data Explorer Dashboard', page_icon='📊', l
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Sales", "Traffic", "Manage"])
+page = st.sidebar.radio("Go to", ["Home", "Sales", "Traffic", "Members", "Feedback"])
 
 # Page routing
 if page == "Home":
@@ -20,6 +20,9 @@ elif page == "Sales":
 elif page == "Traffic":
     import page.traffic as traffic
     traffic.app()
-elif page == "Manage":
-    import page.manage as manage
-    manage.app()
+elif page == "Members":
+    import page.members as members
+    members.app()
+elif page == "Feedback": 
+    import page.feedback as feedback
+    feedback.app()

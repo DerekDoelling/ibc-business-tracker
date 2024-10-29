@@ -11,18 +11,20 @@ import plotly.graph_objects as go
 
 def app():
 
+    st.title('Traffic Dashboard 🚗')
+
+    traffic_example = "data\\traffic_example.png"
+
+    with st.expander('Help ✋'):
+            st.markdown('***How does this work?***')
+            st.markdown('This dashboard will automatically load all the data from the "Daily Business Hours" sheet in the Excel file you upload. It will then provide a summary table and insightful visualizations of the data.')
+            st.markdown('***Why am I getting an error?***')
+            st.markdown('If you are getting an error, please make sure that you are uploading the correct file. The file should be an excel file with a sheet named "Daily Business Hours".')
+            st.markdown('Within the "Daily Business Hours" sheet, there should be these eight columns: Date, Hour, Staff on Duty, Traffic, Customer Traffic, Stop Traffic, Sales per Hour, and Event/Notes. You can add columns to the sheet, but you must have at least the specified columns.')
+            st.image(traffic_example, caption = 'Example')
+
     if 'uploaded_file' in st.session_state:
         uploaded_file = st.session_state.uploaded_file
-    
-        st.title('Traffic Dashboard')
-
-        with st.expander('Help ✋'):
-            st.markdown('***How does this work?***')
-            st.markdown('This dashboard will automatically load all the data from the Sales sheet in the Excel file you upload. It will then provide a summary table and insightful visualizations of the data. You can also filter the data by the date and the items sold on the left under ***Filters*** to get a deeper understanding.')
-            st.markdown('***Why am I getting an error?***')
-            st.markdown('If you are getting an error, please make sure that you are uploading the correct file. The file should be an excel file with a sheet named "Sales".')
-            st.markdown('Within the "Sales" sheet, there should be these five columns: Transaction ID, Date, Item Sold, Quantity Sold, and Total Sales. You can add columns to the sheet, but you must have at least the specified columns.')
-            st.image(sales_example, caption = 'Example')
         
         st.write("This dashboard provides a comprehensive analysis of sales and traffic data over specified dates and hours. Each chart offers insights into different aspects of the data, helping you to understand the patterns and trends. The filter is on the far lefthand side of the screen.")
         st.write(f"Summary of the dashboard:  \n- First table is the raw data from the Daily Business Hour sheet   \n- The next table is a numerical summary showing the average, medium, and standard devation of traffic   \n- The following charts give insights into when customers are mostly likely to walk by. This can help workers to be prepared for the potential increase in demand.")
@@ -42,10 +44,10 @@ def app():
         df['Date'] = pd.to_datetime(df['Date'])
         
         # Create line graph for total sales throughout the dates
-        st.title("Sales and Traffic Analysis")
+        # st.header("Sales and Traffic Analysis")
         
         # Create bar chart for total sales for each hour of the day
-        st.subheader("Total Sales for Each Hour of the Day")
+        st.header("Total Sales for Each Hour of the Day")
         hourly_sales = df.groupby('Hour')['Sales per Hour'].sum().reset_index()
         # st.dataframe(hourly_sales)
         hourly_sales_graph = px.bar(hourly_sales, x=hourly_sales['Hour'], y=hourly_sales['Sales per Hour'], labels={'x': 'Hour', 'y': 'Total Sales'}, color_discrete_sequence=['#F63366'])
@@ -62,13 +64,13 @@ def app():
         
         
         # Show traffic turnover from customer traffic to stop traffic
-        st.subheader("Traffic Turnover Analysis")
+        st.header("Traffic Turnover Analysis")
         turnover_stats = df[['Customer Traffic', 'Stop Traffic']].describe().loc[['mean', '50%', 'std', 'min', 'max']]
         turnover_stats.index = ['Average', 'Median', 'Standard Deviation', 'Minimum', 'Maximum']
         st.table(turnover_stats)
         
         # Customer traffic over hours line chart
-        st.subheader("Customer Traffic Over Hours")
+        st.header("Customer Traffic Over Hours")
         # fig, ax = plt.subplots()
         customer_traffic = df.groupby('Hour')['Customer Traffic'].mean() # .plot(ax=ax, marker='o')
         customer_traffic_graph = px.line(customer_traffic, x=customer_traffic.index, y=customer_traffic.values, markers=True, labels = {'x': 'Hour', 'y': 'Average Customer Traffic'}, color_discrete_sequence=['#F63366'])
@@ -81,7 +83,7 @@ def app():
         
         # Additional charts if relevant
         # For example, let's create a line chart for Stop Traffic over Hours
-        st.subheader("Stop Traffic Over Hours")
+        st.header("Stop Traffic Over Hours")
         # fig, ax = plt.subplots()
         stop_traffic = df.groupby('Hour')['Stop Traffic'].mean() #.plot(ax=ax, marker='o', color='red')
         stop_traffic_graph = px.line(stop_traffic, x=stop_traffic.index, y=stop_traffic.values, markers=True, labels = {'x': 'Hour', 'y': 'Average Stop Traffic'}, color_discrete_sequence=['#F63366'])
@@ -99,7 +101,7 @@ def app():
         weekday_data = df[df['DayOfWeek'].isin(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])]
         
         # Customer and Stop Traffic over the days of the week
-        st.subheader("Customer and Stop Traffic Over Days of the Week")
+        st.header("Customer and Stop Traffic Over Days of the Week")
         
         # fig, ax = plt.subplots()
         cust_traff = weekday_data.groupby('DayOfWeek')['Customer Traffic'].mean().reindex(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']) #.plot(ax=ax, marker='o', label='Customer Traffic')
