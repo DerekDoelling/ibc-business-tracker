@@ -8,12 +8,21 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 # st.set_page_config(page_title='Traffic Dashboard', page_icon='📊')
-st.title('Traffic Dashboard')
 
 def app():
 
     if 'uploaded_file' in st.session_state:
         uploaded_file = st.session_state.uploaded_file
+    
+        st.title('Traffic Dashboard')
+
+        with st.expander('Help ✋'):
+            st.markdown('***How does this work?***')
+            st.markdown('This dashboard will automatically load all the data from the Sales sheet in the Excel file you upload. It will then provide a summary table and insightful visualizations of the data. You can also filter the data by the date and the items sold on the left under ***Filters*** to get a deeper understanding.')
+            st.markdown('***Why am I getting an error?***')
+            st.markdown('If you are getting an error, please make sure that you are uploading the correct file. The file should be an excel file with a sheet named "Sales".')
+            st.markdown('Within the "Sales" sheet, there should be these five columns: Transaction ID, Date, Item Sold, Quantity Sold, and Total Sales. You can add columns to the sheet, but you must have at least the specified columns.')
+            st.image(sales_example, caption = 'Example')
         
         st.write("This dashboard provides a comprehensive analysis of sales and traffic data over specified dates and hours. Each chart offers insights into different aspects of the data, helping you to understand the patterns and trends. The filter is on the far lefthand side of the screen.")
         st.write(f"Summary of the dashboard:  \n- First table is the raw data from the Daily Business Hour sheet   \n- The next table is a numerical summary showing the average, medium, and standard devation of traffic   \n- The following charts give insights into when customers are mostly likely to walk by. This can help workers to be prepared for the potential increase in demand.")
@@ -96,10 +105,14 @@ def app():
         cust_traff = weekday_data.groupby('DayOfWeek')['Customer Traffic'].mean().reindex(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']) #.plot(ax=ax, marker='o', label='Customer Traffic')
         stop_traff = weekday_data.groupby('DayOfWeek')['Stop Traffic'].mean().reindex(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']) #.plot(ax=ax, marker='o', color='red', label='Stop Traffic')
         cust_stop_traff = pd.merge(cust_traff, stop_traff, on = 'DayOfWeek')
-        cust_stop_traff_graph = px.line(cust_stop_traff, x=cust_stop_traff.index, y=cust_stop_traff['Customer Traffic'], labels={'x': 'Day of the Week', 'y': 'Average Traffic'}, color = )
+        cust_stop_traff_df = cust_stop_traff.reset_index().melt(id_vars=['DayOfWeek'], var_name='Traffic Type', value_name='Average Traffic')        
+        # st.dataframe(cust_stop_traff_df)
+
+        cust_stop_traff_graph = px.line(cust_stop_traff_df, x='DayOfWeek', y='Average Traffic', labels={'x': 'Day of the Week', 'y': 'Average Traffic'}, color = 'Traffic Type', markers=True)
         cust_stop_traff_graph.update_traces(hovertemplate='Average Customer Traffic: %{y:.2f}</b><br>Day of the Week: %{x}<extra></extra>')
         cust_stop_traff_graph.update_yaxes(tickformat=",.0f")
         st.plotly_chart(cust_stop_traff_graph)
+
         # ax.set_ylabel('Average Traffic')
         # ax.set_title('Customer and Stop Traffic by Day of the Week')
         # ax.set_xlabel('Day of the Week')
