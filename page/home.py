@@ -5,8 +5,8 @@ import seaborn as sns
 import time
 
 def app():
-    st.title('📊 IBC Data Explorer Dashboard')
-
+    st.title('IBC Dashy 📊')
+# Data Explorer Dashboard
     with st.expander('About this app'):
         st.markdown('**What can this app do?**')
         st.markdown('This app allows you to explore and analyze business data from Excel files.')
@@ -17,7 +17,7 @@ def app():
                    '2. Explore the dashboard')
 
     st.header("Introduction")
-    st.write("Welcome to the IBC Data Explorer Dashboard. This tool allows you to upload and analyze business data from Excel files. The app supports various data visualizations and summaries to help you understand your business metrics better.")
+    st.write("Welcome to the IBC Dashy web app. This tool allows you to upload and analyze business data from Excel files. The app supports various data visualizations and summaries to help you understand your business metrics better.")
 
     st.header("Upload Excel File")
     uploaded_file = st.file_uploader("", type=["xlsx"])

@@ -20,11 +20,13 @@ def app():
         st.markdown('This dashboard will automatically load all the data from the "Member Actions" sheet in the Excel file you upload. It will then provide summary tables and insightful visualizations of the data. The first table will showcase each member\'s number of hours worked. The right column will be displayed as green if the individual member worked at least 40 hours or red if the individual member worked less than 40 hours. Explore individual work contributions by selecting a "Member Name" for the next two tables.')
         st.markdown('***Why am I getting an error?***')
         st.markdown('If you are getting an error, please make sure that you are uploading the correct file. The file should be an excel file with a sheet named "Member Actions".')
-        st.markdown('Within the "Daily Business Hours" sheet, there should be these four columns: Date, Member Name, Task, and Duration. You can add columns to the sheet, but you must have at least the specified columns.')
+        st.markdown('Within the "Member Actions" sheet, there should be these four columns: Date, Member Name, Task, and Duration. You can add columns to the sheet, but you must have at least the specified columns.')
         st.image(member_example, caption = 'Example')
 
     if 'uploaded_file' in st.session_state:
         uploaded_file = st.session_state.uploaded_file
+
+        st.markdown('Note: To accurately track time on this dashboard, please input durations in hours. For instances where work spans less than an hour, use decimal values. For example, if Joe worked for one hour and thirty minutes, he would input 1.5.')
 
         # df = pd.read_excel(uploaded_file, sheet_name=['Member Actions'])
         dataframe = pd.read_excel(uploaded_file, sheet_name=['Member Actions'])
@@ -37,8 +39,7 @@ def app():
         # st.dataframe(df_summary_styled)
         # Display summary table
         st.subheader("Member Actions")
-        st.dataframe
-        (df)
+        st.dataframe(df)
         st.header("Summary of Hours Worked")
         st.dataframe(df_summary_styled)
 
