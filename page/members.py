@@ -103,7 +103,7 @@ def app():
             x=df_summary['Member Name'],
             y=df_summary['Duration'],
             marker_color='#F63366', 
-            hovertemplate='Member: %{x}<br>Duration: %{y} Hours</b><extra></extra>'
+            hovertemplate='Member: %{x}<br>Duration: <b>%{y}<b></b><extra></extra>'
         ))
 
         members_graph.add_shape(
@@ -129,6 +129,10 @@ def app():
             showarrow=False,
             font_color='black'
         )
+
+        members_graph.update_xaxes(showgrid=False)
+        members_graph.update_yaxes(showgrid=False)
+        members_graph.update_yaxes(zeroline=False)
 
         st.plotly_chart(members_graph)
         # fig, ax = plt.subplots(figsize=(10, 6))
