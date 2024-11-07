@@ -19,6 +19,10 @@ def app():
         file_name = f"feedback_{uuid.uuid4()}.docx"
         doc.save(file_name)
         st.write("Thank you for your submission!")
+
+    st.caption("Your feedback will be anonymous.")    
+
+    
         
 
         # with open(file_name, "rb") as file:
